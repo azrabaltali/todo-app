@@ -7,6 +7,14 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
+class Gorev(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    baslik = db.Column(db.String(200), nullable=False)
+    tamamlandi = db.Column(db.Boolean, default=False)
+
+    def __repr__(self):
+        return f"<Gorev {self.id}: {self.baslik}>"
+
 gorevler = [
         {"id":1, "baslik":"Kitap oku", "tamamlandi":False},
         {"id":2, "baslik":"Spor yap", "tamamlandi":True},
