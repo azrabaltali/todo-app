@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>To-Do Listem</title>
+</head>
+<body>
+    <h1>To-Do Listem</h1>
+    <form action="/ekle" method="post">
+        <input type="text" name="baslik" placeholder="Yeni görev ekle!" required>
+        <button type="submit">Ekle</button>
+    </form>
+    {% if gorevler %}
+        <ul>
+            {% for gorev in gorevler %}
+                <li>
+                    {{ gorev.baslik }}
+                    {% if gorev.tamamlandi %}
+                        ✅
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Henüz görev yok.</p>
+    {% endif %}
+</body>
+</html>
