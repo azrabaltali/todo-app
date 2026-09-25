@@ -30,6 +30,20 @@ def gorev_ekle():
 
     return redirect(url_for("ana_sayfa"))
 
+@app.route("/tamamla/<int:gorev_id>", methods = ["POST"])
+def gorev_tamamla(gorev_id):
+    for gorev in gorevler:
+        if gorev["id"] == gorev_id:
+            gorev["tamamlandi"] = not gorev["tamamlandi"]
+            break
+    return redirect(url_for("ana_sayfa"))
+
+@app.route("/sil/<int:gorev_id>", methods=["POST"])
+def gorev_sil(gorev_id):
+    global gorevler
+    gorevler = [g for g in gorevler if g["id"] != gorev_id]
+    return redirect(url_for("ana_sayfa"))
+
 
 if __name__ == "__main__":
     app.run(debug=True)

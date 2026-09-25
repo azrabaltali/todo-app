@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <title>To-Do Listem</title>
 </head>
+
 <body>
     <h1>To-Do Listem</h1>
     <form action="/ekle" method="post">
@@ -11,18 +13,30 @@
         <button type="submit">Ekle</button>
     </form>
     {% if gorevler %}
-        <ul>
-            {% for gorev in gorevler %}
-                <li>
-                    {{ gorev.baslik }}
-                    {% if gorev.tamamlandi %}
-                        ✅
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
+    <ul>
+        {% for gorev in gorevler %}
+        <li>
+            {% if gorev.tamamlandi %}
+            <s>{{ gorev.baslik }}</s> ✅
+            {% else %}
+            {{ gorev.baslik }}
+            {% endif %}
+
+            <form action="/tamamla/{{ gorev.id }}" method="POST" style="display:inline;">
+                <button type="submit">
+                    {% if gorev.tamamlandi %}Geri Al{% else %}Tamamla{% endif %}
+                </button>
+            </form>
+            
+            <form action="/sil/{{ gorev.id }}" method="POST" style="display:inline;">
+                <button type="submit">Sil</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
     {% else %}
-        <p>Henüz görev yok.</p>
+    <p>Henüz görev yok.</p>
     {% endif %}
 </body>
+
 </html>
