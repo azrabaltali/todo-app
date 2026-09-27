@@ -7,6 +7,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
+
 class Gorev(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     baslik = db.Column(db.String(200), nullable=False)
@@ -15,46 +16,38 @@ class Gorev(db.Model):
     def __repr__(self):
         return f"<Gorev {self.id}: {self.baslik}>"
 
-gorevler = [
-        {"id":1, "baslik":"Kitap oku", "tamamlandi":False},
-        {"id":2, "baslik":"Spor yap", "tamamlandi":True},
-        {"id":3, "baslik":"Py çalış", "tamamlandi":False}
-    ]
-sonraki_id = 4  #yeni görev eklerken id vermek için sayaç
 
 @app.route("/")
-
 def ana_sayfa():
-    return render_template("index.html", gorevler = gorevler)
+    gorevler = Gorev.query.all()
+    return render_template("index.html", gorevler=gorevler)
+
 
 @app.route("/ekle", methods=["POST"])
 def gorev_ekle():
-    global sonraki_id
-
-    baslik = request.form.get("baslik","").strip()
+    baslik = request.form.get("baslik", "").strip()
 
     if baslik:
-        gorevler.append({
-            "id": sonraki_id,
-            "baslik": baslik,
-            "tamamlandi": False,
-        })
-        sonraki_id += 1
+        yeni_gorev = Gorev(baslik=baslik)
+        db.session.add(yeni_gorev)
+        db.session.commit()
 
     return redirect(url_for("ana_sayfa"))
 
-@app.route("/tamamla/<int:gorev_id>", methods = ["POST"])
+
+@app.route("/tamamla/<int:gorev_id>", methods=["POST"])
 def gorev_tamamla(gorev_id):
-    for gorev in gorevler:
-        if gorev["id"] == gorev_id:
-            gorev["tamamlandi"] = not gorev["tamamlandi"]
-            break
+    gorev = Gorev.query.get_or_404(gorev_id)
+    gorev.tamamlandi = not gorev.tamamlandi
+    db.session.commit()
     return redirect(url_for("ana_sayfa"))
+
 
 @app.route("/sil/<int:gorev_id>", methods=["POST"])
 def gorev_sil(gorev_id):
-    global gorevler
-    gorevler = [g for g in gorevler if g["id"] != gorev_id]
+    gorev = Gorev.query.get_or_404(gorev_id)
+    db.session.delete(gorev)
+    db.session.commit()
     return redirect(url_for("ana_sayfa"))
 
 
