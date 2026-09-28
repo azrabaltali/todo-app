@@ -11,11 +11,14 @@ db = SQLAlchemy(app)
 class Gorev(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     baslik = db.Column(db.String(200), nullable=False)
+    aciklama = db.Column(db.Text, default="")
+    oncelik = db.Column(db.String(10), default="normal")
+    zorluk = db.Column(db.Integer, default=1)
+    ilerleme = db.Column(db.Integer, default=0)
     tamamlandi = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return f"<Gorev {self.id}: {self.baslik}>"
-
 
 @app.route("/")
 def ana_sayfa():
