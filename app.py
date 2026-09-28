@@ -29,9 +29,17 @@ def ana_sayfa():
 @app.route("/ekle", methods=["POST"])
 def gorev_ekle():
     baslik = request.form.get("baslik", "").strip()
+    aciklama = request.form.get("aciklama", "").strip()
+    oncelik = request.form.get("oncelik", "normal")
+    zorluk = request.form.get("zorluk", "1")
 
     if baslik:
-        yeni_gorev = Gorev(baslik=baslik)
+        yeni_gorev = Gorev(
+            baslik=baslik,
+            aciklama=aciklama,
+            oncelik=oncelik,
+            zorluk=int(zorluk),
+        )
         db.session.add(yeni_gorev)
         db.session.commit()
 

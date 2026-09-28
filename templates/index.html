@@ -16,35 +16,107 @@
 
                 <h1 class="card-title text-center mb-4">📝 To-Do Listem</h1>
 
-                <form action="/ekle" method="POST" class="d-flex gap-2 mb-4">
-                    <input type="text" name="baslik" class="form-control" placeholder="Yeni görev ekle..." required>
-                    <button type="submit" class="btn btn-primary">Ekle</button>
-                </form>
+                {# --- Yeni görev ekleme formu --- #}
+                <div class="card bg-body-tertiary mb-4">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-3 text-secondary">Yeni Görev Ekle</h6>
 
+                        <form action="/ekle" method="POST">
+                            <div class="mb-2">
+                                <input type="text" name="baslik" class="form-control"
+                                    placeholder="Görev başlığı..." required>
+                            </div>
+
+                            <div class="mb-2">
+                                <input type="text" name="aciklama" class="form-control"
+                                    placeholder="Açıklama (opsiyonel)">
+                            </div>
+
+                            <div class="row g-2 mb-2">
+                                <div class="col-6">
+                                    <label class="form-label small mb-1">Öncelik</label>
+                                    <select name="oncelik" class="form-select">
+                                        <option value="dusuk">🟢 Düşük</option>
+                                        <option value="normal" selected>🟡 Normal</option>
+                                        <option value="yuksek">🔴 Yüksek</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-6">
+                                    <label class="form-label small mb-1">Zorluk</label>
+                                    <select name="zorluk" class="form-select">
+                                        <option value="1" selected>⭐ Kolay</option>
+                                        <option value="2">⭐⭐ Orta</option>
+                                        <option value="3">⭐⭐⭐ Zor</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100">Ekle</button>
+                        </form>
+                    </div>
+                </div>
+
+                {# --- Görev listesi --- #}
                 {% if gorevler %}
                 <ul class="list-group">
                     {% for gorev in gorevler %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center gap-2">
-                        <div class="flex-grow-1">
-                            {% if gorev.tamamlandi %}
-                            <s class="text-secondary">{{ gorev.baslik }}</s>
-                            <span class="ms-2">✅</span>
-                            {% else %}
-                            <span>{{ gorev.baslik }}</span>
-                            {% endif %}
-                        </div>
+                    <li class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
 
-                        <div class="d-flex gap-1">
-                            <form action="/tamamla/{{ gorev.id }}" method="POST">
-                                <button type="submit"
-                                    class="btn btn-sm {% if gorev.tamamlandi %}btn-outline-secondary{% else %}btn-success{% endif %}">
-                                    {% if gorev.tamamlandi %}Geri Al{% else %}Tamamla{% endif %}
-                                </button>
-                            </form>
+                            {# Sol taraf: görev bilgileri #}
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    {% if gorev.tamamlandi %}
+                                    <s class="text-secondary">{{ gorev.baslik }}</s>
+                                    <span>✅</span>
+                                    {% else %}
+                                    <span>{{ gorev.baslik }}</span>
+                                    {% endif %}
 
-                            <form action="/sil/{{ gorev.id }}" method="POST">
-                                <button type="submit" class="btn btn-sm btn-danger">Sil</button>
-                            </form>
+                                    {# Öncelik etiketi #}
+                                    {% if gorev.oncelik == "yuksek" %}
+                                    <span class="badge bg-danger">Yüksek</span>
+                                    {% elif gorev.oncelik == "dusuk" %}
+                                    <span class="badge bg-success">Düşük</span>
+                                    {% else %}
+                                    <span class="badge bg-warning text-dark">Normal</span>
+                                    {% endif %}
+
+                                    {# Zorluk yıldızları #}
+                                    <span class="text-warning small">
+                                        {% for _ in range(gorev.zorluk) %}⭐{% endfor %}
+                                    </span>
+                                </div>
+
+                                {% if gorev.aciklama %}
+                                <small class="text-secondary d-block mt-1">{{ gorev.aciklama }}</small>
+                                {% endif %}
+
+                                {# İlerleme çubuğu (henüz etkileşimli değil) #}
+                                <div class="progress mt-2" style="height: 6px;">
+                                    <div class="progress-bar" role="progressbar"
+                                        style="width: {{ gorev.ilerleme }}%;"
+                                        aria-valuenow="{{ gorev.ilerleme }}"
+                                        aria-valuemin="0"
+                                        aria-valuemax="100"></div>
+                                </div>
+                            </div>
+
+                            {# Sağ taraf: butonlar #}
+                            <div class="d-flex gap-1">
+                                <form action="/tamamla/{{ gorev.id }}" method="POST">
+                                    <button type="submit"
+                                        class="btn btn-sm {% if gorev.tamamlandi %}btn-outline-secondary{% else %}btn-success{% endif %}">
+                                        {% if gorev.tamamlandi %}Geri Al{% else %}Tamamla{% endif %}
+                                    </button>
+                                </form>
+
+                                <form action="/sil/{{ gorev.id }}" method="POST">
+                                    <button type="submit" class="btn btn-sm btn-danger">Sil</button>
+                                </form>
+                            </div>
+
                         </div>
                     </li>
                     {% endfor %}
