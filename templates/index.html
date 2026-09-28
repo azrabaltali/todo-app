@@ -93,17 +93,48 @@
                                 <small class="text-secondary d-block mt-1">{{ gorev.aciklama }}</small>
                                 {% endif %}
 
-                                {# İlerleme çubuğu (henüz etkileşimli değil) #}
-                                <div class="progress mt-2" style="height: 6px;">
-                                    <div class="progress-bar" role="progressbar"
-                                        style="width: {{ gorev.ilerleme }}%;"
-                                        aria-valuenow="{{ gorev.ilerleme }}"
-                                        aria-valuemin="0"
-                                        aria-valuemax="100"></div>
+                                {# İlerleme çubuğu + yüzde + butonlar #}
+                                <div class="d-flex align-items-center gap-2 mt-2">
+                                    <div class="progress flex-grow-1" style="height: 8px;">
+                                        {% if gorev.ilerleme <= 33 %}
+                                        <div class="progress-bar bg-danger" role="progressbar"
+                                            style="width: {{ gorev.ilerleme }}%;"
+                                            aria-valuenow="{{ gorev.ilerleme }}"
+                                            aria-valuemin="0" aria-valuemax="100"></div>
+                                        {% elif gorev.ilerleme <= 66 %}
+                                        <div class="progress-bar bg-info" role="progressbar"
+                                            style="width: {{ gorev.ilerleme }}%;"
+                                            aria-valuenow="{{ gorev.ilerleme }}"
+                                            aria-valuemin="0" aria-valuemax="100"></div>
+                                        {% elif gorev.ilerleme <= 99 %}
+                                        <div class="progress-bar bg-warning" role="progressbar"
+                                            style="width: {{ gorev.ilerleme }}%;"
+                                            aria-valuenow="{{ gorev.ilerleme }}"
+                                            aria-valuemin="0" aria-valuemax="100"></div>
+                                        {% else %}
+                                        <div class="progress-bar bg-success" role="progressbar"
+                                            style="width: {{ gorev.ilerleme }}%; "
+                                            aria-valuenow="{{ gorev.ilerleme }}"
+                                            aria-valuemin="0" aria-valuemax="100"></div>
+                                        {% endif %}
+                                    </div>
+                                    <small class="text-secondary">%{{ gorev.ilerleme }}</small>
+
+                                    {# İlerleme kontrol butonları #}
+                                    <form action="/ilerleme/{{ gorev.id }}" method="POST">
+                                        <input type="hidden" name="degisim" value="-10">
+                                        <button type="submit"
+                                            class="btn btn-sm btn-outline-secondary py-0 px-2">−10</button>
+                                    </form>
+                                    <form action="/ilerleme/{{ gorev.id }}" method="POST">
+                                        <input type="hidden" name="degisim" value="10">
+                                        <button type="submit"
+                                            class="btn btn-sm btn-outline-secondary py-0 px-2">+10</button>
+                                    </form>
                                 </div>
                             </div>
 
-                            {# Sağ taraf: butonlar #}
+                            {# Sağ taraf: ana butonlar #}
                             <div class="d-flex gap-1">
                                 <form action="/tamamla/{{ gorev.id }}" method="POST">
                                     <button type="submit"

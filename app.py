@@ -53,6 +53,27 @@ def gorev_tamamla(gorev_id):
     db.session.commit()
     return redirect(url_for("ana_sayfa"))
 
+@app.route("/ilerleme/<int:gorev_id>", methods=["POST"])
+def gorev_ilerleme(gorev_id):
+    gorev = Gorev.query.get_or_404(gorev_id)
+    degisim = int(request.form.get("degisim", 0))
+
+    yeni_deger = gorev.ilerleme + degisim
+
+    # 0-100 arasında sınırla
+    if yeni_deger < 0:
+        yeni_deger = 0
+    elif yeni_deger > 100:
+        yeni_deger = 100
+
+    gorev.ilerleme = yeni_deger
+
+    # İlerleme %100 olduysa otomatik tamamlandı işaretle
+    if yeni_deger == 100:
+        gorev.tamamlandi = True
+
+    db.session.commit()
+    return redirect(url_for("ana_sayfa"))
 
 @app.route("/sil/<int:gorev_id>", methods=["POST"])
 def gorev_sil(gorev_id):
