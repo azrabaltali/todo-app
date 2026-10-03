@@ -15,7 +15,9 @@
             <div class="card-body p-4">
 
                 <h1 class="card-title text-center mb-4">📝 To-Do Listem</h1>
-
+                <div class="text-center mb-3">
+                    <a href="/ozet" class="btn btn-outline-info btn-sm">📊 Günü Bitir / Özet</a>
+                </div>
                 {# --- Yeni görev ekleme formu --- #}
                 <div class="card bg-body-tertiary mb-4">
                     <div class="card-body">
@@ -23,8 +25,8 @@
 
                         <form action="/ekle" method="POST">
                             <div class="mb-2">
-                                <input type="text" name="baslik" class="form-control"
-                                    placeholder="Görev başlığı..." required>
+                                <input type="text" name="baslik" class="form-control" placeholder="Görev başlığı..."
+                                    required>
                             </div>
 
                             <div class="mb-2">
@@ -96,71 +98,65 @@
                                 {# İlerleme çubuğu + yüzde + butonlar #}
                                 <div class="d-flex align-items-center gap-2 mt-2">
                                     <div class="progress flex-grow-1" style="height: 8px;">
-                                        {% if gorev.ilerleme <= 33 %}
-                                        <div class="progress-bar bg-danger" role="progressbar"
-                                            style="width: {{ gorev.ilerleme }}%;"
-                                            aria-valuenow="{{ gorev.ilerleme }}"
-                                            aria-valuemin="0" aria-valuemax="100"></div>
-                                        {% elif gorev.ilerleme <= 66 %}
-                                        <div class="progress-bar bg-info" role="progressbar"
-                                            style="width: {{ gorev.ilerleme }}%;"
-                                            aria-valuenow="{{ gorev.ilerleme }}"
-                                            aria-valuemin="0" aria-valuemax="100"></div>
-                                        {% elif gorev.ilerleme <= 99 %}
-                                        <div class="progress-bar bg-warning" role="progressbar"
-                                            style="width: {{ gorev.ilerleme }}%;"
-                                            aria-valuenow="{{ gorev.ilerleme }}"
-                                            aria-valuemin="0" aria-valuemax="100"></div>
-                                        {% else %}
-                                        <div class="progress-bar bg-success" role="progressbar"
-                                            style="width: {{ gorev.ilerleme }}%; "
-                                            aria-valuenow="{{ gorev.ilerleme }}"
-                                            aria-valuemin="0" aria-valuemax="100"></div>
-                                        {% endif %}
+                                        {% if gorev.ilerleme <= 33 %} <div class="progress-bar bg-danger"
+                                            role="progressbar" style="width: {{ gorev.ilerleme }}%;"
+                                            aria-valuenow="{{ gorev.ilerleme }}" aria-valuemin="0" aria-valuemax="100">
                                     </div>
-                                    <small class="text-secondary">%{{ gorev.ilerleme }}</small>
-
-                                    {# İlerleme kontrol butonları #}
-                                    <form action="/ilerleme/{{ gorev.id }}" method="POST">
-                                        <input type="hidden" name="degisim" value="-10">
-                                        <button type="submit"
-                                            class="btn btn-sm btn-outline-secondary py-0 px-2">−10</button>
-                                    </form>
-                                    <form action="/ilerleme/{{ gorev.id }}" method="POST">
-                                        <input type="hidden" name="degisim" value="10">
-                                        <button type="submit"
-                                            class="btn btn-sm btn-outline-secondary py-0 px-2">+10</button>
-                                    </form>
+                                    {% elif gorev.ilerleme <= 66 %} <div class="progress-bar bg-info" role="progressbar"
+                                        style="width: {{ gorev.ilerleme }}%;" aria-valuenow="{{ gorev.ilerleme }}"
+                                        aria-valuemin="0" aria-valuemax="100">
                                 </div>
+                                {% elif gorev.ilerleme <= 99 %} <div class="progress-bar bg-warning" role="progressbar"
+                                    style="width: {{ gorev.ilerleme }}%;" aria-valuenow="{{ gorev.ilerleme }}"
+                                    aria-valuemin="0" aria-valuemax="100">
                             </div>
-
-                            {# Sağ taraf: ana butonlar #}
-                            <div class="d-flex gap-1">
-                                <form action="/tamamla/{{ gorev.id }}" method="POST">
-                                    <button type="submit"
-                                        class="btn btn-sm {% if gorev.tamamlandi %}btn-outline-secondary{% else %}btn-success{% endif %}">
-                                        {% if gorev.tamamlandi %}Geri Al{% else %}Tamamla{% endif %}
-                                    </button>
-                                </form>
-
-                                <form action="/sil/{{ gorev.id }}" method="POST">
-                                    <button type="submit" class="btn btn-sm btn-danger">Sil</button>
-                                </form>
-                            </div>
-
+                            {% else %}
+                            <div class="progress-bar bg-success" role="progressbar"
+                                style="width: {{ gorev.ilerleme }}%; " aria-valuenow="{{ gorev.ilerleme }}"
+                                aria-valuemin="0" aria-valuemax="100"></div>
+                            {% endif %}
                         </div>
-                    </li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <div class="text-center text-secondary py-4">
-                    <p class="mb-0">Henüz görev yok.</p>
-                    <small>Yukarıdaki kutudan ilk görevini ekle!</small>
-                </div>
-                {% endif %}
+                        <small class="text-secondary">%{{ gorev.ilerleme }}</small>
 
+                        {# İlerleme kontrol butonları #}
+                        <form action="/ilerleme/{{ gorev.id }}" method="POST">
+                            <input type="hidden" name="degisim" value="-10">
+                            <button type="submit" class="btn btn-sm btn-outline-secondary py-0 px-2">−10</button>
+                        </form>
+                        <form action="/ilerleme/{{ gorev.id }}" method="POST">
+                            <input type="hidden" name="degisim" value="10">
+                            <button type="submit" class="btn btn-sm btn-outline-secondary py-0 px-2">+10</button>
+                        </form>
             </div>
         </div>
+
+        {# Sağ taraf: ana butonlar #}
+        <div class="d-flex gap-1">
+            <form action="/tamamla/{{ gorev.id }}" method="POST">
+                <button type="submit"
+                    class="btn btn-sm {% if gorev.tamamlandi %}btn-outline-secondary{% else %}btn-success{% endif %}">
+                    {% if gorev.tamamlandi %}Geri Al{% else %}Tamamla{% endif %}
+                </button>
+            </form>
+
+            <form action="/sil/{{ gorev.id }}" method="POST">
+                <button type="submit" class="btn btn-sm btn-danger">Sil</button>
+            </form>
+        </div>
+
+    </div>
+    </li>
+    {% endfor %}
+    </ul>
+    {% else %}
+    <div class="text-center text-secondary py-4">
+        <p class="mb-0">Henüz görev yok.</p>
+        <small>Yukarıdaki kutudan ilk görevini ekle!</small>
+    </div>
+    {% endif %}
+
+    </div>
+    </div>
 
     </div>
 </body>

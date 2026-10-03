@@ -20,6 +20,7 @@ class Gorev(db.Model):
     def __repr__(self):
         return f"<Gorev {self.id}: {self.baslik}>"
 
+
 @app.route("/")
 def ana_sayfa():
     gorevler = Gorev.query.all()
@@ -53,6 +54,15 @@ def gorev_tamamla(gorev_id):
     db.session.commit()
     return redirect(url_for("ana_sayfa"))
 
+
+@app.route("/sil/<int:gorev_id>", methods=["POST"])
+def gorev_sil(gorev_id):
+    gorev = Gorev.query.get_or_404(gorev_id)
+    db.session.delete(gorev)
+    db.session.commit()
+    return redirect(url_for("ana_sayfa"))
+
+
 @app.route("/ilerleme/<int:gorev_id>", methods=["POST"])
 def gorev_ilerleme(gorev_id):
     gorev = Gorev.query.get_or_404(gorev_id)
@@ -75,12 +85,36 @@ def gorev_ilerleme(gorev_id):
     db.session.commit()
     return redirect(url_for("ana_sayfa"))
 
-@app.route("/sil/<int:gorev_id>", methods=["POST"])
-def gorev_sil(gorev_id):
-    gorev = Gorev.query.get_or_404(gorev_id)
-    db.session.delete(gorev)
-    db.session.commit()
-    return redirect(url_for("ana_sayfa"))
+
+@app.route("/ozet")
+def ozet():
+    tum_gorevler = Gorev.query.all()
+
+    toplam_gorev = len(tum_gorevler)
+    tamamlanan = [g for g in tum_gorevler if g.tamamlandi]
+    tamamlanan_sayi = len(tamamlanan)
+
+    # Tamamlanan görevlerin zorluk puanlarını topla
+    kazanilan_yildiz = sum(g.zorluk for g in tamamlanan)
+
+    # Maksimum olası yıldız (hepsi tamamlansaydı)
+    maksimum_yildiz = sum(g.zorluk for g in tum_gorevler)
+
+    # Yüzde (0'a bölme hatasına karşı)
+    if maksimum_yildiz > 0:
+        basari_yuzdesi = round((kazanilan_yildiz / maksimum_yildiz) * 100)
+    else:
+        basari_yuzdesi = 0
+
+    return render_template(
+        "ozet.html",
+        toplam_gorev=toplam_gorev,
+        tamamlanan_sayi=tamamlanan_sayi,
+        kazanilan_yildiz=kazanilan_yildiz,
+        maksimum_yildiz=maksimum_yildiz,
+        basari_yuzdesi=basari_yuzdesi,
+        tamamlanan=tamamlanan,
+    )
 
 
 if __name__ == "__main__":
