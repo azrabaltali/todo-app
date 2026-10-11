@@ -1,11 +1,42 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import (
+    LoginManager,
+    UserMixin,
+    login_user,
+    logout_user,
+    login_required,
+    current_user,
+)
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///todo.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SECRET_KEY"] = "cok-gizli-bir-anahtar-bunu-sonra-degistir"
 
 db = SQLAlchemy(app)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "giris"
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Kullanici.query.get(int(user_id))
+
+
+class Kullanici(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    kullanici_adi = db.Column(db.String(50), unique=True, nullable=False)
+    sifre_hash = db.Column(db.String(200), nullable=False)
+
+    gorevler = db.relationship("Gorev", backref="sahip", lazy=True)
+
+    def __repr__(self):
+        return f"<Kullanici {self.kullanici_adi}>"
 
 
 class Gorev(db.Model):
@@ -16,6 +47,7 @@ class Gorev(db.Model):
     zorluk = db.Column(db.Integer, default=1)
     ilerleme = db.Column(db.Integer, default=0)
     tamamlandi = db.Column(db.Boolean, default=False)
+    kullanici_id = db.Column(db.Integer, db.ForeignKey("kullanici.id"), nullable=False)
 
     def __repr__(self):
         return f"<Gorev {self.id}: {self.baslik}>"
