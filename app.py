@@ -1,6 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for
-from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_sqlalchemy import SQLAlchemy
 from flask_login import (
     LoginManager,
     UserMixin,
@@ -60,11 +59,10 @@ class Gorev(db.Model):
 
 @app.route("/auth", methods=["GET", "POST"])
 def auth():
-    aktif_sekme = request.form.get("form_tipi", "giris")  # POST'ta hangi form gönderildi
+    aktif_sekme = request.form.get("form_tipi", "giris")
 
     if request.method == "POST":
         if aktif_sekme == "kayit":
-            # --- KAYIT İŞLEMİ ---
             email = request.form.get("email", "").strip().lower()
             kullanici_adi = request.form.get("kullanici_adi", "").strip()
             sifre = request.form.get("sifre", "")
@@ -100,7 +98,6 @@ def auth():
             return redirect(url_for("auth"))
 
         else:
-            # --- GİRİŞ İŞLEMİ ---
             email = request.form.get("email", "").strip().lower()
             sifre = request.form.get("sifre", "")
 
@@ -114,7 +111,6 @@ def auth():
             login_user(kullanici)
             return redirect(url_for("ana_sayfa"))
 
-    # GET isteği → formu göster
     return render_template("auth.html", aktif_sekme=aktif_sekme)
 
 
@@ -123,13 +119,24 @@ def cikis():
     logout_user()
     return redirect(url_for("auth"))
 
+
 # ---------------------- GÖREV ROUTE'LARI ---------------------- #
 
 @app.route("/")
 @login_required
 def ana_sayfa():
-    gorevler = Gorev.query.filter_by(kullanici_id=current_user.id).all()
-    return render_template("index.html", gorevler=gorevler)
+    filtre = request.args.get("filtre", "tumu")
+
+    sorgu = Gorev.query.filter_by(kullanici_id=current_user.id)
+
+    if filtre == "aktif":
+        sorgu = sorgu.filter_by(tamamlandi=False)
+    elif filtre == "tamamlanan":
+        sorgu = sorgu.filter_by(tamamlandi=True)
+
+    gorevler = sorgu.all()
+
+    return render_template("index.html", gorevler=gorevler, filtre=filtre)
 
 
 @app.route("/ekle", methods=["POST"])
